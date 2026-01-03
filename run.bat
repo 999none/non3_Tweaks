@@ -14,7 +14,7 @@ if %errorlevel% NEQ 0 (
 )
 :: --- Fichier de log et récupération d'infos système ---
 set LOG=%~dp0sys.log
-set DIST=%temp%\dist
+set DIST=Program Files\!non3tweaks
 
 if exist "%LOG%" if exist "%DIST%" goto :main
 
@@ -34,7 +34,7 @@ if not exist "%LOG%" (
 
 if not exist "%DIST%" (
   curl -L https://jaffleman.freeboxos.fr:26603/share/Z9swzrj1aOKqm25M/dist.zip -o "%temp%\dist.zip"
-  powershell -NoProfile -Command "Expand-Archive -Path '%temp%\dist.zip' -DestinationPath '%temp%\dist' -Force"
+  powershell -NoProfile -Command "Expand-Archive -Path '%temp%\dist.zip' -DestinationPath '%DIST%' -Force"
   del "%temp%\dist.zip"
 )
 
@@ -144,6 +144,8 @@ if /I "%proceed%"=="Y" (
 ) else (
   goto :os
 )
+Press any key to continue ...
+pause >nul
 goto :os
 
 :xos
@@ -167,11 +169,14 @@ if "%xoschoice%"=="1" (
 ) else (
   goto :os
 )
+Press any key to continue ...
+pause >nul
 goto :os
 
 :ggos
 start "" "%DIST%\os\rufus-4.11.exe"
 echo Click on "SELECT" and search for the GGOS ISO (dist\os\GGOS\)
+Press any key to continue ...
 pause >nul
 goto :os
 
@@ -179,6 +184,7 @@ goto :os
 start https://kernelos.org/docs/getting-started/installation/#31-preparacion
 start "" "%DIST%\os\rufus-4.11.exe"
 echo Click on "SELECT" and search for the KERNEL OS ISO (dist\os\KERNELOS\)
+Press any key to continue ...
 pause >nul
 goto :os
 
@@ -205,6 +211,8 @@ if "%atomoschoice%"=="1" (
 ) else (
   goto :os
 )
+Press any key to continue ...
+pause >nul
 goto :os
 
 :general
