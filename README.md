@@ -1,4 +1,2 @@
 # NON3️⃣ TWEAKS
-The Only Optimazation Batch Program you really need to enhance your PC Performance !
-
-
+A Batch Optimization Program with all you really need to completely optimize your PC.
