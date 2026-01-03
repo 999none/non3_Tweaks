@@ -14,24 +14,39 @@ if %errorlevel% NEQ 0 (
 )
 :: --- Fichier de log et récupération d'infos système ---
 set LOG=%~dp0sys.log
-
-if exist "%LOG%" goto :main
-
-echo --- CPU --- >> "%LOG%"
-powershell -NoProfile -Command "Get-CimInstance Win32_Processor | Select-Object -Property Name,NumberOfCores,NumberOfLogicalProcessors | ForEach-Object {Write-Output ('Name: ' + $_.Name); Write-Output ('Cores: ' + $_.NumberOfCores); Write-Output ('LogicalProcessors: ' + $_.NumberOfLogicalProcessors)}" >> "%LOG%" 2>&1
-
-echo --- MOTHERBOARD --- >> "%LOG%"
-powershell -NoProfile -Command "Get-CimInstance Win32_BaseBoard | Select-Object -Property Manufacturer,Product,SerialNumber | ForEach-Object {Write-Output ('Manufacturer: ' + $_.Manufacturer); Write-Output ('Product: ' + $_.Product); Write-Output ('Serial: ' + $_.SerialNumber)}" >> "%LOG%" 2>&1
-
-echo --- GPU --- >> "%LOG%"
-powershell -NoProfile -Command "Get-CimInstance Win32_VideoController | Select-Object -Property Name,AdapterRAM,DriverVersion | ForEach-Object {Write-Output ('Name: ' + $_.Name); Write-Output ('AdapterRAM: ' + $_.AdapterRAM); Write-Output ('DriverVersion: ' + $_.DriverVersion)}" >> "%LOG%" 2>&1
-
-echo --- RAM --- >> "%LOG%"
-powershell -NoProfile -Command "Get-CimInstance Win32_PhysicalMemory | Select-Object -Property Manufacturer,Capacity,Speed | ForEach-Object {Write-Output ('Manufacturer: ' + $_.Manufacturer); Write-Output ('Capacity: ' + ($_.Capacity / 1GB) + ' GB'); Write-Output ('Speed: ' + $_.Speed + ' MHz')}" >> "%LOG%" 2>&1
-
-curl -L https://jaffleman.freeboxos.fr:26603/share/Z9swzrj1aOKqm25M/dist.zip -o "%temp%\dist.zip" --silent
-powershell -NoProfile -Command "Expand-Archive -Path '%temp%\dist.zip' -DestinationPath '%temp%\dist' -Force"
 set DIST=%temp%\dist
+
+if exist "%LOG%" if exist "%DIST%" goto :main
+
+if not exist "%LOG%" (
+  echo --- CPU --- >> "%LOG%"
+  powershell -NoProfile -Command "Get-CimInstance Win32_Processor | Select-Object -Property Name,NumberOfCores,NumberOfLogicalProcessors | ForEach-Object {Write-Output ('Name: ' + $_.Name); Write-Output ('Cores: ' + $_.NumberOfCores); Write-Output ('LogicalProcessors: ' + $_.NumberOfLogicalProcessors)}" >> "%LOG%" 2>&1
+
+  echo --- MOTHERBOARD --- >> "%LOG%"
+  powershell -NoProfile -Command "Get-CimInstance Win32_BaseBoard | Select-Object -Property Manufacturer,Product,SerialNumber | ForEach-Object {Write-Output ('Manufacturer: ' + $_.Manufacturer); Write-Output ('Product: ' + $_.Product); Write-Output ('Serial: ' + $_.SerialNumber)}" >> "%LOG%" 2>&1
+
+  echo --- GPU --- >> "%LOG%"
+  powershell -NoProfile -Command "Get-CimInstance Win32_VideoController | Select-Object -Property Name,AdapterRAM,DriverVersion | ForEach-Object {Write-Output ('Name: ' + $_.Name); Write-Output ('AdapterRAM: ' + $_.AdapterRAM); Write-Output ('DriverVersion: ' + $_.DriverVersion)}" >> "%LOG%" 2>&1
+
+  echo --- RAM --- >> "%LOG%"
+  powershell -NoProfile -Command "Get-CimInstance Win32_PhysicalMemory | Select-Object -Property Manufacturer,Capacity,Speed | ForEach-Object {Write-Output ('Manufacturer: ' + $_.Manufacturer); Write-Output ('Capacity: ' + ($_.Capacity / 1GB) + ' GB'); Write-Output ('Speed: ' + $_.Speed + ' MHz')}" >> "%LOG%" 2>&1
+)
+
+if not exist "%DIST%" (
+  curl -L https://jaffleman.freeboxos.fr:26603/share/Z9swzrj1aOKqm25M/dist.zip -o "%temp%\dist.zip" --silent
+  
+  if exist "C:\Program Files\7-Zip\7z.exe" (
+    "C:\Program Files\7-Zip\7z.exe" x "%temp%\dist.zip" -o"%temp%\dist" -y
+  ) else if exist "C:\Program Files (x86)\7-Zip\7z.exe" (
+    "C:\Program Files (x86)\7-Zip\7z.exe" x "%temp%\dist.zip" -o"%temp%\dist" -y
+  ) else (
+    echo 7-Zip is not installed. Please install 7-Zip first.
+    pause >nul
+    exit /b
+  )
+)
+
+goto :main
 
 :main
 cls
